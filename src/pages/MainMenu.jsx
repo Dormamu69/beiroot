@@ -1,41 +1,12 @@
 import React from "react";
+import { Link } from 'react-router-dom';
+import Nav from "../common/NavBar";
 
 const MainMenu = () => {
   return (
     <div style={{ backgroundColor: "#f2f2f2" }}>
-      <div className={"content is-fluid"}>
-        <nav className="navbar" role="navigation" aria-label="main navigation">
-          <div className="navbar-brand">
-            <a
-              role="button"
-              className="navbar-burger"
-              aria-label="menu"
-              aria-expanded="false"
-              data-target="navbarBasicExample"
-            >
-              <span ariaHidden="true"></span>
-              <span ariaHidden="true"></span>
-              <span ariaHidden="true"></span>
-            </a>
-          </div>
-
-          <div id="navbarBasicExample" className="navbar-menu">
-            <div className="navbar-start">
-              <div className="buttons">
-                <a className="button is-primary">Full Screen Icon</a>
-              </div>
-            </div>
-
-            <div className="navbar-end">
-              <div className="navbar-item">
-                <div className="buttons">
-                  <a className="button is-primary">Mute/Unmute Icon</a>
-                  {/* <a className="button is-primary">Full Screen Icon</a> */}
-                </div>
-              </div>
-            </div>
-          </div>
-        </nav>
+      <div className={"content"}>
+     <Nav/>
         <section className="hero is-fullheight">
           <div className="hero-body">
             {/* using bulma css create a main menu with play,leaderboard,how to play options */}
@@ -49,14 +20,14 @@ const MainMenu = () => {
                   <div className="box">
                     <div className="columns is-centered">
                       <div className="buttons is-centered">
-                        <a className="button is-primary is-fullwidth">Play</a>
-                        <a className="button is-primary is-fullwidth">
+                        <Link className="button is-primary is-fullwidth" to={"/game"}>Play</Link>
+                        <Link className="button is-primary is-fullwidth" to={"/leaderboard"}>
                           Leaderboard
-                        </a>
-                        <a className="button is-primary is-fullwidth">
+                        </Link>
+                        <Link className="button is-primary is-fullwidth" to={"/howtoplay"}>
                           How To Play
-                        </a>
-                        <a className="button is-primary is-fullwidth">Quit</a>
+                        </Link>
+                        <Link className="button is-primary is-fullwidth" to={"/game"}>Quit</Link>
                       </div>
                     </div>
                   </div>

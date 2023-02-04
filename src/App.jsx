@@ -4,8 +4,8 @@ import "./App.css";
 import { Route, Routes } from "react-router-dom";
 import  Game from "./pages/Game";
 import  MainMenu from "./pages/MainMenu";
-import  StartGame from "./pages/StartGame";
-import  Settings from "./pages/Settings";
+import  HowToPlay from "./pages/HowToPlay";
+import  LeaderBoard from "./pages/LeaderBoard";
 import  NotFound from "./pages/NotFound";
 
 function App() {
@@ -16,8 +16,8 @@ function App() {
       <Routes>
         <Route path="/" element={<MainMenu />} />
         <Route path="/game" element={<Game />} />
-        <Route path="/start" element={<StartGame />} />
-        <Route path="/settings" element={<Settings />} />
+        <Route path="/howtoplay" element={<HowToPlay />} />
+        <Route path="/leaderboard" element={<LeaderBoard />} />
         <Route path="*" element={<NotFound />} />
 
       </Routes>
