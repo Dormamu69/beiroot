@@ -19,16 +19,28 @@ const Game = ({ letters }) => {
   const [selectedLetter, setSelectedLetter] = React.useState("");
   const [selectedIndex, setSelectedIndex] = React.useState(-1);
   const [score, setScore] = React.useState(0);
+  const [selectedDifficulty, setSelectedDifficulty] = React.useState(undefined);
 
   useEffect(() => {
-    newWord();
-  }, []);
+    if (selectedDifficulty !== undefined) newWord();
+  }, [selectedDifficulty]);
 
   const newWord = () => {
-    let question = words[Math.floor(Math.random() * words.length)];
-    setWord(question);
-    setOrignalWord(question);
-    resetScore();
+    while (1) {
+      let word = words[Math.floor(Math.random() * words.length)];
+      const wordQuestion = GameManager.getGroupedByDifficulty(
+        word.answer,
+        selectedDifficulty,
+        1
+      )[0];
+      if (wordQuestion === undefined) continue;
+      word.question = wordQuestion.word;
+      word.difficulty = wordQuestion.difficulty;
+      setWord(word);
+      setOrignalWord(word);
+      resetScore();
+      break;
+    }
   };
 
   const replaceLetter = (letter, index) => {
@@ -47,16 +59,34 @@ const Game = ({ letters }) => {
   const handleSubmit = () => {
     // check if the word is correct
     if (word.question === word.answer) {
+      localStorage.setItem(
+        "scores",
+        JSON.stringify([
+          ...JSON.parse(localStorage.getItem("scores") || "[]"),
+          {
+            score: (score / word.difficulty) * 100,
+            date: new Date().toLocaleDateString(),
+          },
+        ])
+      );
       setIsExploding(true);
       Swal.fire({
         title: "Good job!",
-        text: `Congratulations you found the root word in ${score} moves!`,
+        text: `Congratulations you found the root word in ${score} moves! Best score is ${
+          word.difficulty
+            ? "100"
+            : (Math.max(
+                score,
+                Math.max(localStorage.getItem("bestScore")) || 0
+              ) /
+                word.difficulty) *
+              100
+        } %`,
         icon: "success",
         confirmButtonText: "Play Again",
         denyButtonText: "Main Menu",
         showDenyButton: true,
       }).then((result) => {
-        /* Read more about isConfirmed, isDenied below */
         if (result.isConfirmed) {
           newWord();
           setIsExploding(false);
@@ -115,14 +145,15 @@ const Game = ({ letters }) => {
             <div className="content">
               <h1>Description</h1>
               <div className="columns is-centered is-8">
-                <div className="column is-4 is-right">{word["description"]}</div>
+                <div className="column is-4 is-right">
+                  {word["description"]}
+                </div>
                 <div className="column is-4 is-left">
                   <img
                     src={word["image"]}
                     alt="word"
                     style={{ maxHeight: "200px", minHeight: "200px" }}
                   />
-
                 </div>
               </div>
             </div>
@@ -212,9 +243,44 @@ const Game = ({ letters }) => {
     <div className="content">
       {/* <h1>Game</h1> */}
       <Nav home={true} />
-      {renderPage()}
+      {selectedDifficulty !== undefined ? (
+        renderPage()
+      ) : (
+        <DifficultyMenu setSelectedDifficulty={setSelectedDifficulty} />
+      )}
     </div>
   );
 };
+
+function DifficultyMenu(props) {
+  const difficultyMap = {
+    ገማች: 0,
+    ለማጅ: 1,
+    አዋቂ: 2,
+    ብልህ: 3,
+    ሞኝ: 4,
+  };
+  return (
+    <div className="box">
+      <h1 className="title">Select Difficulty</h1>
+
+      <div className="buttons is-centered">
+        {Object.keys(difficultyMap).map((difficulty, index) => {
+          return (
+            <button
+              key={index}
+              className="button is-primary full-width"
+              onClick={() => {
+                props.setSelectedDifficulty(index);
+              }}
+            >
+              {difficulty}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
 
 export default Game;

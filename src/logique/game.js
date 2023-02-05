@@ -54,7 +54,13 @@ function getAllValidMoves(graph, letter) {
       type: neighbour.type,
     });
   });
-  return moves;
+  return moves.reduce((acc, current) => {
+    const x = acc.find((item) => item.letter === current.letter);
+    if (!x) {
+      return acc.concat([current]);
+    }
+    return acc;
+  }, []);
 }
 
 function getLetterGroup(graph, letter, visited = new Map(), depth = 0) {
@@ -105,22 +111,22 @@ function generateAllPotentialQuestions(graph, word) {
   return collection;
 }
 
-function getGroupedByDifficulty(questions, difficulty, maxSize = 10) {
-  //                    ገማች፣ ለማጅ፣ አዋቂ፣ ብልህ፣ ሞኝ
-  const DIFFICULTY_GROUPS = [1, 3, 6, 10, 20, Infinity];
+function getGroupedByDifficulty(word, difficulty, maxSize = 10) {
+  const questions = generateAllPotentialQuestions(getGameGraph(), word);
+  const DIFFICULTY_GROUPS = [1, 5, 10, 20, Infinity];
   const lowerBound = DIFFICULTY_GROUPS[difficulty];
   const upperBound = DIFFICULTY_GROUPS[difficulty + 1] || Infinity;
   if(lowerBound === Infinity) return questions.sort((a, b) => b.difficulty - a.difficulty).slice(0, maxSize);
   return questions.filter((x) => x.difficulty >= lowerBound && x.difficulty < upperBound).slice(0, maxSize);
 }
 
+
 export default {
   getGameGraph,
   getAllValidMoves,
   generateAllPotentialQuestions,
+  getGroupedByDifficulty
 };
 
-console.log(generateAllPotentialQuestions(getGameGraph(), "ሰላም"));
-const x = generateAllPotentialQuestions(getGameGraph(), "ሰላም")
-// console.log(x[Math.floor(Math.random() * x.length)]);
-console.log(getGroupedByDifficulty(x, 5));
+
+console.log(getAllValidMoves(getGameGraph(), "ሶ"));
