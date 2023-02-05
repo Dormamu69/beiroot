@@ -127,6 +127,3 @@ export default {
   generateAllPotentialQuestions,
   getGroupedByDifficulty
 };
-
-
-console.log(getAllValidMoves(getGameGraph(), "ሶ"));
