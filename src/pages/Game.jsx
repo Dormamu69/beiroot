@@ -5,11 +5,11 @@ import { faRotateRight, faCheck } from "@fortawesome/free-solid-svg-icons";
 import ConfettiExplosion from "react-confetti-explosion";
 import Swal from "sweetalert2";
 
-import words from "../words";
-import Nav from "../common/NavBar";
-import WordCard from "../common/WordCard";
-import ActionCard from "../common/actionCard";
-import GameManager from "../logique/game";
+import words from "../words.js";
+import Nav from "../common/NavBar.jsx";
+import WordCard from "../common/WordCard.jsx";
+import ActionCard from "../common/actionCard.jsx";
+import GameManager from "../logique/game.jsx";
 
 const Game = ({ letters }) => {
   const [isExploding, setIsExploding] = React.useState(false);
