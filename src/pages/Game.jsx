@@ -64,7 +64,7 @@ const Game = ({ letters }) => {
         JSON.stringify([
           ...JSON.parse(localStorage.getItem("scores") || "[]"),
           {
-            score: (score / word.difficulty) * 100,
+            score: (word.difficulty / score ) * 100,
             date: new Date().toLocaleDateString(),
           },
         ])
@@ -74,13 +74,13 @@ const Game = ({ letters }) => {
         title: "Good job!",
         text: `Congratulations you found the root word in ${score} moves! Best score is ${
           word.difficulty
-            ? "100"
-            : (Math.max(
-                score,
-                Math.max(localStorage.getItem("bestScore")) || 0
-              ) /
-                word.difficulty) *
+            ? (word.difficulty /
+                Math.max(
+                  score,
+                  Math.max(localStorage.getItem("bestScore")) || 0
+                )) *
               100
+            : "100"
         } %`,
         icon: "success",
         confirmButtonText: "Play Again",
@@ -140,6 +140,7 @@ const Game = ({ letters }) => {
         <>
           <div className="content">
             <h1>Score: {score}</h1>
+            {JSON.stringify(word)}
           </div>
           <div className="box">
             <div className="content">
