@@ -1,10 +1,9 @@
 import React from "react";
-import { Link, HashRouter } from "react-router-dom";
+import { Link } from "react-router-dom";
 import Nav from "../common/NavBar";
 
 const MainMenu = () => {
   return (
-    <HashRouter>
       <div style={{ backgroundColor: "#f2f2f2" }}>
         <div className={"content"}>
           <Nav home={true} />
@@ -55,7 +54,6 @@ const MainMenu = () => {
           </section>
         </div>
       </div>
-    </HashRouter>
   );
 };
 
