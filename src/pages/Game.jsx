@@ -9,7 +9,7 @@ import words from "../words.js";
 import Nav from "../common/NavBar.jsx";
 import WordCard from "../common/WordCard.jsx";
 import ActionCard from "../common/ActionCard.jsx";
-import GameManager from "../logique/game.jsx";
+import GameManager from "../logique/game.js";
 
 const Game = ({ letters }) => {
   const [isExploding, setIsExploding] = React.useState(false);
