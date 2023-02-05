@@ -6,7 +6,7 @@ const MainMenu = () => {
   return (
     <div style={{ backgroundColor: "#f2f2f2" }}>
       <div className={"content"}>
-     <Nav/>
+     <Nav home = {true}/>
         <section className="hero is-fullheight">
           <div className="hero-body">
             {/* using bulma css create a main menu with play,leaderboard,how to play options */}
