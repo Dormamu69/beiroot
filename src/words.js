@@ -69,7 +69,7 @@ const words = [
     description: "እይታን የሚያስደስት እንደ ቅርፅ፣ ቀለም ወይም ቅርፅ ያሉ የጥራት ጥምረት።",
     answer: "ውበት",
     image:
-      "https://media.istockphoto.com/id/492201907/photo/many-tools.jpg?s=612x612&w=0&k=20&c=zCuvI6bjhmpsGkbvKK6vBI6Zovv_bRgIrDNSAC3x3tM=",
+      "https://thumbs.dreamstime.com/b/abstract-poster-woman-face-one-line-drawing-style-female-beauty-fashion-minimalist-concept-contour-face-line-art-design-t-189497327.jpg",
   },
   {
     description:
