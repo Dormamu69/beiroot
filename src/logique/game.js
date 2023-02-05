@@ -15,29 +15,29 @@ function getGameGraph() {
       .map((x) => (x ? x : "?"));
     const sound = values.slice(6, 11);
     const add_line = values.slice(11, 17);
-    if (r_90 != "?") {
-      graph.addEdge(letter, r_90, "90");
+   if (r_90 != "?") {
+      graph.addEdge(letter, r_90, "Rot 90");
     }
     if (r_180 != "?") {
-      graph.addEdge(letter, r_180, "180");
+      graph.addEdge(letter, r_180, "Rot 180");
     }
     if (r_270 != "?") {
-      graph.addEdge(letter, r_270, "270");
+      graph.addEdge(letter, r_270, "Rot 270");
     }
     if (flip_h != "?") {
-      graph.addEdge(letter, flip_h, "H");
+      graph.addEdge(letter, flip_h, "Flip H");
     }
     if (flip_v != "?") {
-      graph.addEdge(letter, flip_v, "V");
+      graph.addEdge(letter, flip_v, "Flip V");
     }
     for (var j = 0; j < sound.length; j++) {
       if (sound[j] && sound[j] != "?") {
-        graph.addEdge(letter, sound[j], "sound");
+        graph.addEdge(letter, sound[j], "Sound");
       }
     }
     for (var j = 0; j < add_line.length; j++) {
       if (add_line[j] && add_line[j] != "?") {
-        graph.addEdge(letter, add_line[j], "line");
+        graph.addEdge(letter, add_line[j], "Manuplate Line");
       }
     }
   }
