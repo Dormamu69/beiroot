@@ -51,7 +51,7 @@ function getAllValidMoves(graph, letter) {
   letterNeighbours.forEach((neighbour) => {
     moves.push({
       letter: neighbour.node,
-      type: neighbour.type,
+      action: neighbour.type,
     });
   });
   return moves.reduce((acc, current) => {
