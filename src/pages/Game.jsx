@@ -8,7 +8,7 @@ import Swal from "sweetalert2";
 import words from "../words.js";
 import Nav from "../common/NavBar.jsx";
 import WordCard from "../common/WordCard.jsx";
-import ActionCard from "../common/actionCard.jsx";
+import ActionCard from "../common/ActionCard.jsx";
 import GameManager from "../logique/game.jsx";
 
 const Game = ({ letters }) => {
