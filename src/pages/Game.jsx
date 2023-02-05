@@ -5,11 +5,11 @@ import { faRotateRight, faCheck } from "@fortawesome/free-solid-svg-icons";
 import ConfettiExplosion from "react-confetti-explosion";
 import Swal from "sweetalert2";
 
-import words from "../words";
-import Nav from "../common/NavBar";
-import WordCard from "../common/WordCard";
-import ActionCard from "../common/actionCard";
-import GameManager from "../logique/game";
+import words from "../words.js";
+import Nav from "../common/NavBar.jsx";
+import WordCard from "../common/WordCard.jsx";
+import ActionCard from "../common/ActionCard.jsx";
+import GameManager from "../logique/game.js";
 
 const Game = ({ letters }) => {
   const [isExploding, setIsExploding] = React.useState(false);
@@ -64,7 +64,7 @@ const Game = ({ letters }) => {
         JSON.stringify([
           ...JSON.parse(localStorage.getItem("scores") || "[]"),
           {
-            score: (score / word.difficulty) * 100,
+            score: (word.difficulty / score ) * 100,
             date: new Date().toLocaleDateString(),
           },
         ])
@@ -74,13 +74,13 @@ const Game = ({ letters }) => {
         title: "Good job!",
         text: `Congratulations you found the root word in ${score} moves! Best score is ${
           word.difficulty
-            ? "100"
-            : (Math.max(
-                score,
-                Math.max(localStorage.getItem("bestScore")) || 0
-              ) /
-                word.difficulty) *
+            ? (word.difficulty /
+                Math.max(
+                  score,
+                  Math.max(localStorage.getItem("bestScore")) || 0
+                )) *
               100
+            : "100"
         } %`,
         icon: "success",
         confirmButtonText: "Play Again",
