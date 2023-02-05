@@ -140,7 +140,6 @@ const Game = ({ letters }) => {
         <>
           <div className="content">
             <h1>Score: {score}</h1>
-            {JSON.stringify(word)}
           </div>
           <div className="box">
             <div className="content">
