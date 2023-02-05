@@ -1,5 +1,5 @@
 import Graph from "./graph.js";
-import GRAPH_DATA from "./data";
+import GRAPH_DATA from "./data.js";
 
 function getGameGraph() {
   var graph = new Graph();
@@ -10,7 +10,9 @@ function getGameGraph() {
     var values = line.replace(" ", "").split(",");
     var letter = values[0];
     graph.addNode(letter);
-    const [r_90, r_180, r_270, flip_h, flip_v] = values.slice(1, 6).map((x) => x ? x : "?");
+    const [r_90, r_180, r_270, flip_h, flip_v] = values
+      .slice(1, 6)
+      .map((x) => (x ? x : "?"));
     const sound = values.slice(6, 11);
     const add_line = values.slice(11, 17);
     if (r_90 != "?") {
@@ -46,7 +48,7 @@ function getGameGraph() {
 function getAllValidMoves(graph, letter) {
   var moves = [];
   const letterNeighbours = graph.getGraph()[letter];
-  letterNeighbours?.forEach((neighbour) => {
+  letterNeighbours.forEach((neighbour) => {
     moves.push({
       letter: neighbour.node,
       type: neighbour.type,
@@ -55,7 +57,70 @@ function getAllValidMoves(graph, letter) {
   return moves;
 }
 
+function getLetterGroup(graph, letter, visited = new Map(), depth = 0) {
+  const letterNeighbours = graph.getGraph()[letter];
+  visited.set(letter, depth);
+  letterNeighbours.forEach((neighbour) => {
+    if (visited.has(neighbour.node)) return;
+    visited.set(neighbour.node, depth);
+    const relatedLetters = getLetterGroup(
+      graph,
+      neighbour.node,
+      visited,
+      depth + 1
+    );
+    Object.keys(relatedLetters).forEach((x) => visited.set(x, depth + 1));
+  });
+  return visited;
+}
+
+function generateAllPotentialQuestions(graph, word) {
+  const letters = word.split("");
+  const letterGroups = letters.map((letter) => getLetterGroup(graph, letter));
+  const collection = [
+    ...Array.from(letterGroups[0].entries()).map((x) => ({
+      word: x[0],
+      difficulty: x[1],
+    })),
+  ];
+
+  let collectionSize = collection.length;
+  for (var i = 1; i < letterGroups.length; i++) {
+    const newCollection = [];
+    const step = Math.max(1, Math.floor(collectionSize / 30000));
+    for (var j = 0; j < Math.min(collectionSize, 30000); j+=step) {
+      const current = collection.shift();
+      Array.from(letterGroups[i].keys()).forEach((letter) => {
+        if(newCollection.length > 100000) return;
+        newCollection.push({
+          word: current.word + letter,
+          difficulty: letterGroups[i].get(letter) + current.difficulty,
+        });
+      });
+    }
+    collection.length = 0;
+    collection.push(...newCollection);
+    collectionSize = collection.length;
+  }
+  return collection;
+}
+
+function getGroupedByDifficulty(questions, difficulty, maxSize = 10) {
+  //                    ገማች፣ ለማጅ፣ አዋቂ፣ ብልህ፣ ሞኝ
+  const DIFFICULTY_GROUPS = [1, 3, 6, 10, 20, Infinity];
+  const lowerBound = DIFFICULTY_GROUPS[difficulty];
+  const upperBound = DIFFICULTY_GROUPS[difficulty + 1] || Infinity;
+  if(lowerBound === Infinity) return questions.sort((a, b) => b.difficulty - a.difficulty).slice(0, maxSize);
+  return questions.filter((x) => x.difficulty >= lowerBound && x.difficulty < upperBound).slice(0, maxSize);
+}
+
 export default {
   getGameGraph,
   getAllValidMoves,
+  generateAllPotentialQuestions,
 };
+
+console.log(generateAllPotentialQuestions(getGameGraph(), "ሰላም"));
+const x = generateAllPotentialQuestions(getGameGraph(), "ሰላም")
+// console.log(x[Math.floor(Math.random() * x.length)]);
+console.log(getGroupedByDifficulty(x, 5));

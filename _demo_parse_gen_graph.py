@@ -38,7 +38,7 @@ class Graph:
         return str(self.matrix)
 
 datas = []
-with open(FILE_NAME, "r") as file:
+with open(FILE_NAME, "r", encoding='utf-8') as file:
     for line in file:
         letter, *rest = line.strip().replace(" ", "").split(",")
         r_90, r_180, r_270, flip_h, flip_v, *rest = rest
@@ -84,17 +84,19 @@ for data in datas:
     letter = data["letter"]
     network.add_node(letter, label=letter)
     if data["r_90"]:
-        network.add_edge(letter, data["r_90"], value="90")
+        network.add_edge(letter, data["r_90"], title="90")
     if data["r_180"]:
-        network.add_edge(letter, data["r_180"], value="180")
+        network.add_edge(letter, data["r_180"], title="180")
     if data["r_270"]:
-        network.add_edge(letter, data["r_270"], value="270")
+        network.add_edge(letter, data["r_270"], title="270")
     if data["flip_h"]:
-        network.add_edge(letter, data["flip_h"], value="H")
+        network.add_edge(letter, data["flip_h"], title="H")
     if data["flip_v"]:
-        network.add_edge(letter, data["flip_v"], value="V")
+        network.add_edge(letter, data["flip_v"], title="V")
     for add_line in data["add_line"]:
-        network.add_edge(letter, add_line, value="add_line")
+        network.add_edge(letter, add_line, title="add_line")
+    for sound in data["sound"]:
+        network.add_edge(letter, sound, title="sound")
     
 network.show("graph.html")
 

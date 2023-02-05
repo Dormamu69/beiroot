@@ -88,7 +88,7 @@ const Game = ({ letters }) => {
       "Flip V",
       "Manipulate Letter",
     ];
-    const graph = GameManager.getGameGraph('../../data.csv');
+    const graph = GameManager.getGameGraph("../../data.csv");
     let actions = GameManager.getAllValidMoves(graph, letter);
     setActions(actions);
   };
@@ -114,7 +114,17 @@ const Game = ({ letters }) => {
           <div className="box">
             <div className="content">
               <h1>Description</h1>
-              {word["Description"]}
+              <div className="columns is-centered is-8">
+                <div className="column is-4 is-right">{word["description"]}</div>
+                <div className="column is-4 is-left">
+                  <img
+                    src={word["image"]}
+                    alt="word"
+                    style={{ maxHeight: "200px", minHeight: "200px" }}
+                  />
+
+                </div>
+              </div>
             </div>
           </div>
           <div className="buttons is-centered">
