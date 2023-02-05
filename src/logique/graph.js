@@ -6,12 +6,12 @@ export default class Graph {
 
     addNode(node) {
         this.nodes.push(node);
-        this.graph[node] = [];
+        this.graph[node] = this.graph[node] || [];
     }
 
     addEdge(node1, node2, type) {
-        if(!this.graph[node1]) this.addNode(node1);
-        if(!this.graph[node2]) this.addNode(node2);
+        if(!Array.isArray(this.graph[node1])) this.addNode(node1);
+        if(!Array.isArray(this.graph[node2])) this.addNode(node2);
 
         this.graph[node1].push({node: node2, type: type});
         this.graph[node2].push({node: node1, type: type});
