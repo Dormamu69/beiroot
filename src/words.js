@@ -145,12 +145,12 @@ const words = [
     image:
       "https://cdn.discordapp.com/attachments/1008571074981658694/1071768834953990166/0xecho_cookies_that_donot_look_like_cookies_d95c88b2-4eb2-43e0-80f3-c3e5816587cb.png",
   },
-  {
-    description: "ጆ ፣ ጃው ፣ ጆንኒ ፣ ነስሩ",
-    answer: "ዮሃንስ",
-    image:
-      "https://cdn.discordapp.com/attachments/962396182846537740/1071772563014963281/jow.jpg",
-  },
+  // {
+  //   description: "ጆ ፣ ጃው ፣ ጆንኒ ፣ ነስሩ",
+  //   answer: "ዮሃንስ",
+  //   image:
+  //     "https://cdn.discordapp.com/attachments/962396182846537740/1071772563014963281/jow.jpg",
+  // },
   {
     "description": "ስህተቶችን ለማስተካከል ወደ ሌንሶች የተፈጨ ሁለት ብርጭቆ ወይም ፕላስቲክን የሚይዝ ፍሬም",
     "answer": "መነጽር",
