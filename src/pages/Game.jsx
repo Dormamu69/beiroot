@@ -1,15 +1,17 @@
 import React, { useEffect } from "react";
 import ReactDOM from "react-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faRotateRight, faCheck } from "@fortawesome/free-solid-svg-icons";
+import { faRotateRight, faCheck, faAdd } from "@fortawesome/free-solid-svg-icons";
 import ConfettiExplosion from "react-confetti-explosion";
 import Swal from "sweetalert2";
+import ReactGA from "react-ga";
 
 import words from "../words.js";
 import Nav from "../common/NavBar.jsx";
 import WordCard from "../common/WordCard.jsx";
 import ActionCard from "../common/ActionCard.jsx";
 import GameManager from "../logique/game.js";
+import { DIFFICULTY_GROUPS, DIFFICULTY_MAP } from "../logique/constants.js";
 
 const Game = ({ letters }) => {
   const [isExploding, setIsExploding] = React.useState(false);
@@ -18,29 +20,79 @@ const Game = ({ letters }) => {
   const [actions, setActions] = React.useState([]);
   const [selectedLetter, setSelectedLetter] = React.useState("");
   const [selectedIndex, setSelectedIndex] = React.useState(-1);
-  const [score, setScore] = React.useState(0);
+  const [moves, setMoves] = React.useState(0);
   const [selectedDifficulty, setSelectedDifficulty] = React.useState(undefined);
 
   useEffect(() => {
-    if (selectedDifficulty !== undefined) newWord();
+    if (selectedDifficulty !== undefined) {
+      newWord();
+      ReactGA.event({
+        category: "Game",
+        action: "Difficulty Selected",
+        label: selectedDifficulty,
+      });
+    }
   }, [selectedDifficulty]);
 
   const newWord = () => {
-    while (1) {
-      let word = words[Math.floor(Math.random() * words.length)];
-      const wordQuestion = GameManager.getGroupedByDifficulty(
-        word.answer,
-        selectedDifficulty,
-        1
-      )[0];
-      if (wordQuestion === undefined) continue;
-      word.question = wordQuestion.word;
-      word.difficulty = wordQuestion.difficulty;
-      setWord(word);
-      setOrignalWord(word);
-      resetScore();
-      break;
+    const playerWordsUsed =
+      JSON.parse(localStorage.getItem("playerWordsUsed")) || [];
+    const difficultyLowerBound = DIFFICULTY_GROUPS[selectedDifficulty];
+    const filteredWords = words.filter(
+      (word) => word.maxDifficulty >= difficultyLowerBound
+    );
+    if (!filteredWords.length) {
+      Swal.fire({
+        title: "No more words",
+        text: "This probably should not have happened. Please contact the developer.",
+        icon: "error",
+        confirmButtonText: "Ok",
+      }).then(() => {
+        window.location.reload();
+      });
+      return;
     }
+    const wordProbabilities = filteredWords.map((word) => {
+      const wordUsedCount = playerWordsUsed.filter(
+        (playerWord) => playerWord === word.answer
+      ).length;
+      return 1 / (wordUsedCount + 1);
+    });
+    const totalProbability = wordProbabilities.reduce((a, b) => a + b, 0);
+    const random = Math.random() * totalProbability;
+    let potentialWord = filteredWords[0];
+    let probabilitySum = wordProbabilities[0];
+    for (let i = 1; i < filteredWords.length; i++) {
+      if (random < probabilitySum) {
+        potentialWord = filteredWords[i];
+        break;
+      }
+      probabilitySum += wordProbabilities[i];
+    }
+
+    const wordQuestion = GameManager.getGroupedByDifficulty(
+      potentialWord.answer,
+      selectedDifficulty,
+      1
+    )[0];
+
+    if (wordQuestion === undefined) {
+      Swal.fire({
+        title: "No more words",
+        text: "This probably should not have happened. Please contact the developer.",
+        icon: "error",
+        confirmButtonText: "Ok",
+      }).then(() => {
+        window.location.reload();
+      });
+      return;
+    }
+    potentialWord.question = wordQuestion.word;
+    potentialWord.difficulty = wordQuestion.difficulty;
+    setWord(potentialWord);
+    setOrignalWord(potentialWord);
+    setActions([]);
+    resetScore();
   };
 
   const replaceLetter = (letter, index) => {
@@ -64,7 +116,7 @@ const Game = ({ letters }) => {
         JSON.stringify([
           ...JSON.parse(localStorage.getItem("scores") || "[]"),
           {
-            score: (word.difficulty / score ) * 100,
+            score: (word.difficulty / moves) * 100,
             date: new Date().toLocaleDateString(),
           },
         ])
@@ -72,16 +124,20 @@ const Game = ({ letters }) => {
       setIsExploding(true);
       Swal.fire({
         title: "Good job!",
-        text: `Congratulations you found the root word in ${score} moves! Best score is ${
-          word.difficulty
-            ? (word.difficulty /
-                Math.max(
-                  score,
-                  Math.max(localStorage.getItem("bestScore")) || 0
-                )) *
-              100
-            : "100"
-        } %`,
+        text: `Congratulations you found the root word in ${moves} moves! Your solution was 
+         ${
+           word.difficulty
+             ? (Math.round(
+                 word.difficulty /
+                   Math.max(
+                     moves,
+                     Math.max(localStorage.getItem("bestScore")) || 0
+                   )
+               ) *
+                 10000) /
+               100
+             : "100"
+         }% efficient.`,
         icon: "success",
         confirmButtonText: "Play Again",
         denyButtonText: "Main Menu",
@@ -125,27 +181,55 @@ const Game = ({ letters }) => {
 
   const handleReset = () => {
     setWord(orignalWord);
+    setActions([]);
     resetScore();
   };
   const addScore = () => {
-    setScore(score + 1);
+    setMoves(moves + 1);
   };
   const resetScore = () => {
-    setScore(0);
+    setMoves(0);
   };
 
   const renderPage = () => {
     if (word["question"]) {
       return (
         <>
-          <div className="content">
-            <h1>Score: {score}</h1>
+          <div className="content" style={{ marginTop: "0px" }}>
+            <div className="columns is-centered">
+              <div className="column is-5">
+                <h5
+                  className={
+                    moves > word.difficulty
+                      ? "title is-5 has-text-danger"
+                      : "title is-5 has-text-success"
+                  }
+                >
+                  ሙከራዎች: {moves} / {word.difficulty}
+                </h5>
+              </div>
+              <div className="column is-5">
+                <h5 className="title is-5 has-text-primary">
+                  ክብደት:{" "}
+                  {
+                    Object.entries(DIFFICULTY_MAP).find(
+                      (entry) => entry[1] === selectedDifficulty
+                    )[0]
+                  }
+                </h5>
+              </div>
+            </div>
           </div>
           <div className="box">
             <div className="content">
-              <h1>Description</h1>
+              <h3>ማብራሪያ</h3>
               <div className="columns is-centered is-8">
-                <div className="column is-4 is-right">
+                <div
+                  className="column is-4 is-right has-text-centered"
+                  style={{
+                    margin: "auto 0",
+                  }}
+                >
                   {word["description"]}
                 </div>
                 <div className="column is-4 is-left">
@@ -158,46 +242,14 @@ const Game = ({ letters }) => {
               </div>
             </div>
           </div>
-          <div className="buttons is-centered">
-            <button
-              className="button is-primary"
-              onClick={() => {
-                handleSubmit();
-              }}
-            >
-              {/* add  fa check icon */}
-              <FontAwesomeIcon icon={faCheck} /> {"\t"}Submit
-            </button>
-            {isExploding && (
-              <ConfettiExplosion
-                force={0.6}
-                duration={5000}
-                particleCount={200}
-                height={1600}
-                width={1600}
-              />
-            )}
-            <button
-              className="button is-primary"
-              onClick={() => {
-                newWord();
-              }}
-            >
-              {/* add  fa reload icon */}
-              New Word
-            </button>
-            <button
-              className="button is-primary"
-              onClick={() => {
-                handleReset();
-              }}
-            >
-              {/* add  fa reload icon */}
-              <FontAwesomeIcon icon={faRotateRight} />
-            </button>
-          </div>
+          
           <div className="box">
-            <h1>Find The Root Word</h1>
+            {/* <h1>Find The Root Word</h1> */}
+            <h3>
+              <span className="has-text-grey"> 
+                የ ቃሉን ስር ይፈልጉ
+              </span>
+            </h3>
             <div className="columns is-centered">
               {word["question"].split("").map((letter, index) => {
                 return (
@@ -215,7 +267,7 @@ const Game = ({ letters }) => {
               })}
             </div>
           </div>
-          {actions && (
+          {actions.length ? (
             <div className="box">
               <div className="columns">
                 {actions.map((action, index) => {
@@ -232,7 +284,61 @@ const Game = ({ letters }) => {
                 })}
               </div>
             </div>
+          ) : (
+            <div className="box">
+              <p className="title is-6 has-text-centered has-text-grey is-italic has-text-weight-light">
+                Wow, such empty
+              </p>
+            </div>
           )}
+          <div className="buttons is-centered">
+            <button
+              className="button is-primary"
+              onClick={() => {
+                handleSubmit();
+              }}
+            >
+              <FontAwesomeIcon icon={faCheck} /> {"\t "} ሙከራ ይፈጽሙ
+            </button>
+            {isExploding && (
+              <ConfettiExplosion
+                force={0.6}
+                duration={5000}
+                particleCount={200}
+                height={1600}
+                width={1600}
+              />
+            )}
+            <button
+              className="button is-primary"
+              onClick={() => {
+                newWord();
+              }}
+            >
+              <FontAwesomeIcon icon={faAdd} /> {"\t "}
+              አዲስ ቃል ይጠቀሙ
+            </button>
+            <button
+              className="button is-primary"
+              onClick={() => {
+                handleReset();
+              }}
+            >
+              <FontAwesomeIcon icon={faRotateRight} />
+              እንደገና ይጀምሩ
+            </button>
+            <button
+              className="button is-primary"
+              onClick={() => {
+                setSelectedDifficulty(undefined);
+              }}
+            >
+              <span role="img" aria-label="emoji">
+                😅
+              </span>{" "}
+              ክብደት ይቀይሩ
+            </button>
+          </div>
         </>
       );
     } else {
@@ -241,7 +347,6 @@ const Game = ({ letters }) => {
   };
   return (
     <div className="content">
-      {/* <h1>Game</h1> */}
       <Nav home={true} />
       {selectedDifficulty !== undefined ? (
         renderPage()
@@ -253,19 +358,12 @@ const Game = ({ letters }) => {
 };
 
 function DifficultyMenu(props) {
-  const difficultyMap = {
-    ገማች: 0,
-    ለማጅ: 1,
-    አዋቂ: 2,
-    ብልህ: 3,
-    ሞኝ: 4,
-  };
   return (
     <div className="box">
       <h1 className="title">Select Difficulty</h1>
 
       <div className="buttons is-centered">
-        {Object.keys(difficultyMap).map((difficulty, index) => {
+        {Object.keys(DIFFICULTY_MAP).map((difficulty, index) => {
           return (
             <button
               key={index}

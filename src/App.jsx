@@ -1,23 +1,26 @@
-import { useState,useEffect } from "react";
-import reactLogo from "./assets/react.svg";
-import "./App.css";
+import { useEffect } from "react";
 import { Route, Routes } from "react-router-dom";
+import ReactGA from "react-ga";
+
 import  Game from "./pages/Game";
 import  MainMenu from "./pages/MainMenu";
 import  HowToPlay from "./pages/HowToPlay";
 import  LeaderBoard from "./pages/LeaderBoard";
 import  NotFound from "./pages/NotFound";
-import ReactGA from "react-ga";
+
+import "./App.css";
 
 function App() {
-  const [count, setCount] = useState(0);
   const TRACKING_ID = "UA-205453516-2"; // OUR_TRACKING_ID
   ReactGA.initialize(TRACKING_ID);
 
-
   useEffect(() => {
     ReactGA.pageview(window.location.pathname + window.location.search);
-  }, []);
+  }, [
+    window.location.pathname,
+    window.location.search,
+  ]);
+
   return (
     <div className="App">
       <Routes>

@@ -1,3 +1,5 @@
+import GameManager from "./logique/game.js";
+
 const words = [
   {
     id: "1",
@@ -181,4 +183,7 @@ const words = [
     "image": "https://previews.123rf.com/images/upixel123/upixel1231211/upixel123121100104/16433832-africa-map-ethiopia.jpg"
 }
 ];
-export default words;
+export default words.map((word) => ({
+  ...word,
+  maxDifficulty: GameManager.getMaxDifficulty(word.answer)
+}));

@@ -1,6 +1,8 @@
 import Graph from "./graph.js";
 import GRAPH_DATA from "./data.js";
 
+import { DIFFICULTY_GROUPS } from "./constants.js";
+
 function getGameGraph() {
   var graph = new Graph();
 
@@ -15,7 +17,7 @@ function getGameGraph() {
       .map((x) => (x ? x : "?"));
     const sound = values.slice(6, 11);
     const add_line = values.slice(11, 17);
-   if (r_90 != "?") {
+    if (r_90 != "?") {
       graph.addEdge(letter, r_90, "Rot 90");
     }
     if (r_180 != "?") {
@@ -37,7 +39,7 @@ function getGameGraph() {
     }
     for (var j = 0; j < add_line.length; j++) {
       if (add_line[j] && add_line[j] != "?") {
-        graph.addEdge(letter, add_line[j], "Manuplate Line");
+        graph.addEdge(letter, add_line[j], "Manipulate Line");
       }
     }
   }
@@ -63,20 +65,18 @@ function getAllValidMoves(graph, letter) {
   }, []);
 }
 
-function getLetterGroup(graph, letter, visited = new Map(), depth = 0) {
-  const letterNeighbours = graph.getGraph()[letter];
-  visited.set(letter, depth);
-  letterNeighbours.forEach((neighbour) => {
-    if (visited.has(neighbour.node)) return;
-    visited.set(neighbour.node, depth);
-    const relatedLetters = getLetterGroup(
-      graph,
-      neighbour.node,
-      visited,
-      depth + 1
-    );
-    Object.keys(relatedLetters).forEach((x) => visited.set(x, depth + 1));
-  });
+function getLetterGroup(graph, letter) {
+  const queue = [{ letter, depth: 0 }];
+  const visited = new Map();
+  while (queue.length > 0) {
+    const current = queue.shift();
+    if (visited.has(current.letter)) continue;
+    visited.set(current.letter, current.depth);
+    const letterNeighbours = graph.getGraph()[current.letter];
+    letterNeighbours.forEach((neighbour) => {
+      queue.push({ letter: neighbour.node, depth: current.depth + 1 });
+    });
+  }
   return visited;
 }
 
@@ -94,10 +94,10 @@ function generateAllPotentialQuestions(graph, word) {
   for (var i = 1; i < letterGroups.length; i++) {
     const newCollection = [];
     const step = Math.max(1, Math.floor(collectionSize / 30000));
-    for (var j = 0; j < Math.min(collectionSize, 30000); j+=step) {
+    for (var j = 0; j < Math.min(collectionSize, 30000); j += step) {
       const current = collection.shift();
       Array.from(letterGroups[i].keys()).forEach((letter) => {
-        if(newCollection.length > 100000) return;
+        if (newCollection.length > 100000) return;
         newCollection.push({
           word: current.word + letter,
           difficulty: letterGroups[i].get(letter) + current.difficulty,
@@ -113,17 +113,28 @@ function generateAllPotentialQuestions(graph, word) {
 
 function getGroupedByDifficulty(word, difficulty, maxSize = 10) {
   const questions = generateAllPotentialQuestions(getGameGraph(), word);
-  const DIFFICULTY_GROUPS = [1, 5, 10, 20, Infinity];
   const lowerBound = DIFFICULTY_GROUPS[difficulty];
   const upperBound = DIFFICULTY_GROUPS[difficulty + 1] || Infinity;
-  if(lowerBound === Infinity) return questions.sort((a, b) => b.difficulty - a.difficulty).slice(0, maxSize);
-  return questions.filter((x) => x.difficulty >= lowerBound && x.difficulty < upperBound).slice(0, maxSize);
+  if (lowerBound === Infinity)
+    return questions
+      .sort((a, b) => b.difficulty - a.difficulty)
+      .slice(0, maxSize);
+  return questions
+    .filter((x) => x.difficulty >= lowerBound && x.difficulty <= upperBound)
+    .slice(0, maxSize);
 }
 
+function getMaxDifficulty(word) {
+  const questions = generateAllPotentialQuestions(getGameGraph(), word);
+  return questions.reduce((acc, current) => {
+    return Math.max(acc, current.difficulty);
+  }, 0);
+}
 
 export default {
   getGameGraph,
   getAllValidMoves,
   generateAllPotentialQuestions,
-  getGroupedByDifficulty
+  getGroupedByDifficulty,
+  getMaxDifficulty,
 };
