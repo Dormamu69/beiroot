@@ -1,7 +1,11 @@
 import React, { useEffect } from "react";
 import ReactDOM from "react-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faRotateRight, faCheck, faAdd } from "@fortawesome/free-solid-svg-icons";
+import {
+  faRotateRight,
+  faCheck,
+  faAdd,
+} from "@fortawesome/free-solid-svg-icons";
 import ConfettiExplosion from "react-confetti-explosion";
 import Swal from "sweetalert2";
 import ReactGA from "react-ga";
@@ -48,7 +52,13 @@ const Game = ({ letters }) => {
         icon: "error",
         confirmButtonText: "Ok",
       }).then(() => {
-        window.location.reload();
+        Promise.resolve(
+          ReactGA.event({
+            category: "Game",
+            action: "No more words",
+            label: `No words matching difficulty ${selectedDifficulty}`,
+          })
+        ).then(() => window.location.reload());
       });
       return;
     }
@@ -242,13 +252,11 @@ const Game = ({ letters }) => {
               </div>
             </div>
           </div>
-          
+
           <div className="box">
             {/* <h1>Find The Root Word</h1> */}
             <h3>
-              <span className="has-text-grey"> 
-                የ ቃሉን ስር ይፈልጉ
-              </span>
+              <span className="has-text-grey">የ ቃሉን ስር ይፈልጉ</span>
             </h3>
             <div className="columns is-centered">
               {word["question"].split("").map((letter, index) => {
