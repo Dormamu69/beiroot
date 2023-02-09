@@ -131,6 +131,13 @@ const Game = ({ letters }) => {
           },
         ])
       );
+      localStorage.setItem(
+        "playerWordsUsed",
+        JSON.stringify([
+          ...JSON.parse(localStorage.getItem("playerWordsUsed") || "[]"),
+          word.answer,
+        ])
+      );
       setIsExploding(true);
       Swal.fire({
         title: "Good job!",
