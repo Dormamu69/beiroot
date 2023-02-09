@@ -139,21 +139,15 @@ const Game = ({ letters }) => {
         ])
       );
       setIsExploding(true);
+      const score =
+        (word.difficulty /
+          Math.max(moves, Math.max(localStorage.getItem("bestScore")) || 0)) *
+        100;
       Swal.fire({
         title: "Good job!",
         text: `Congratulations you found the root word in ${moves} moves! Your solution was 
          ${
-           word.difficulty
-             ? (Math.round(
-                 word.difficulty /
-                   Math.max(
-                     moves,
-                     Math.max(localStorage.getItem("bestScore")) || 0
-                   )
-               ) *
-                 10000) /
-               100
-             : "100"
+           word.difficulty ? Math.round(score * 100) / 100 : "100"
          }% efficient.`,
         icon: "success",
         confirmButtonText: "Play Again",
