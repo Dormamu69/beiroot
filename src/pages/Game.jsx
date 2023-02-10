@@ -323,7 +323,7 @@ const Game = ({ letters }) => {
           )}
           <div className="buttons is-centered">
             <button
-              className="button is-sucess"
+              className="button is-success"
               onClick={() => {
                 handleSubmit();
               }}
@@ -340,7 +340,7 @@ const Game = ({ letters }) => {
               />
             )}
             <button
-              className="button is-secondary"
+              className="button is-primary"
               onClick={() => {
                 newWord();
               }}
@@ -358,7 +358,7 @@ const Game = ({ letters }) => {
               እንደገና ይጀምሩ
             </button>
             <button
-              className="button is-secondary"
+              className="button is-warning"
               onClick={() => {
                 setSelectedDifficulty(undefined);
               }}
