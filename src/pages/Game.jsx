@@ -48,7 +48,7 @@ const Game = ({ letters }) => {
     }
   }, [isExploding]);
 
-  useEffect(() => { 
+  useEffect(() => {
     if (moves > 0) {
       ReactGA.event({
         category: "Game",
@@ -58,13 +58,33 @@ const Game = ({ letters }) => {
     }
   }, [moves]);
 
+  const getRidiculousWords = (words, playerWordsUsed) => {
+    const wordsUsedCount = playerWordsUsed.reduce((acc, word) => {
+      acc[word] = (acc[word] || 0) + 1;
+      return acc;
+    }, {});
+    const adjustedDifficulty = words.map((word) => ({
+      ...word,
+      maxDifficulty: word.maxDifficulty - (wordsUsedCount[word.answer] || 0),
+    }));
+    const mostDifficultWord = adjustedDifficulty.reduce((acc, word) => {
+      if (word.maxDifficulty > acc.maxDifficulty) {
+        return word;
+      }
+      return acc;
+    }, { maxDifficulty: 0 });
+    return mostDifficultWord;
+  };
+
   const newWord = () => {
     const playerWordsUsed =
       JSON.parse(localStorage.getItem("playerWordsUsed")) || [];
     const difficultyLowerBound = DIFFICULTY_GROUPS[selectedDifficulty];
-    const filteredWords = words.filter(
-      (word) => word.maxDifficulty >= difficultyLowerBound
-    );
+    const filteredWords =
+      difficultyLowerBound === Infinity
+        ? [getRidiculousWords(words, playerWordsUsed)]
+        : words.filter((word) => word.maxDifficulty >= difficultyLowerBound);
+
     if (!filteredWords.length) {
       Swal.fire({
         title: "No more words",
