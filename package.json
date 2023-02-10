@@ -13,6 +13,7 @@
     "@fortawesome/free-solid-svg-icons": "^6.2.1",
     "@fortawesome/react-fontawesome": "^0.2.0",
     "bulma": "^0.9.4",
+    "disqus-react": "^1.1.5",
     "react": "^18.2.0",
     "react-confetti-explosion": "^1.5.1",
     "react-dom": "^18.2.0",

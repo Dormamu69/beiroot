@@ -38,6 +38,26 @@ const Game = ({ letters }) => {
     }
   }, [selectedDifficulty]);
 
+  useEffect(() => {
+    if (isExploding) {
+      ReactGA.event({
+        category: "Game",
+        action: "Word Found",
+        label: word.answer,
+      });
+    }
+  }, [isExploding]);
+
+  useEffect(() => { 
+    if (moves > 0) {
+      ReactGA.event({
+        category: "Game",
+        action: "Move Made",
+        label: moves,
+      });
+    }
+  }, [moves]);
+
   const newWord = () => {
     const playerWordsUsed =
       JSON.parse(localStorage.getItem("playerWordsUsed")) || [];
@@ -51,15 +71,7 @@ const Game = ({ letters }) => {
         text: "This probably should not have happened. Please contact the developer.",
         icon: "error",
         confirmButtonText: "Ok",
-      }).then(() => {
-        Promise.resolve(
-          ReactGA.event({
-            category: "Game",
-            action: "No more words",
-            label: `No words matching difficulty ${selectedDifficulty}`,
-          })
-        ).then(() => window.location.reload());
-      });
+      }).then(() => window.location.reload());
       return;
     }
     const wordProbabilities = filteredWords.map((word) => {
@@ -93,6 +105,11 @@ const Game = ({ letters }) => {
         icon: "error",
         confirmButtonText: "Ok",
       }).then(() => {
+        ReactGA.event({
+          category: "Game",
+          action: "No More Words",
+          label: selectedDifficulty,
+        });
         window.location.reload();
       });
       return;
@@ -194,6 +211,10 @@ const Game = ({ letters }) => {
     setWord(orignalWord);
     setActions([]);
     resetScore();
+    ReactGA.event({
+      category: "Game",
+      action: "Reset",
+    });
   };
   const addScore = () => {
     setMoves(moves + 1);

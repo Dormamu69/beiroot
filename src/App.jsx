@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { Route, Routes, HashRouter } from "react-router-dom";
 import ReactGA from "react-ga";
+import { DiscussionEmbed } from "disqus-react";
 
 import Game from "./pages/Game";
 import MainMenu from "./pages/MainMenu";
@@ -27,6 +28,16 @@ function App() {
         <Route path="/leaderboard" element={<LeaderBoard />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
+      <div className="disqus">
+        <DiscussionEmbed
+          shortname="beiroot"
+          config={{
+            url: "https://beiroot.vercel.app/",
+            identifier: "beiroot",
+            title: "Beiroot",
+          }}
+        />
+      </div>
     </div>
   );
 }
