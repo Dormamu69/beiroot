@@ -2,7 +2,7 @@
 - A game where you have to use 4 [fixes] to match the given word to a given description.
 
 ### The rules
-- You can rotate a character by 90, 180 or 270 degrees.
+- You can rotate a character by 90, 180 or 270 degrees. 
 - You can flip a character horizontally or vertically.
 - You can add a - or a | to a character, provided that the new character is still a valid character.
 - You can remove a - or a | from a character, provided that the new character is still a valid character.
